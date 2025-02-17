@@ -6,7 +6,6 @@ import * as htmlToImage from 'html-to-image';
 export default function Wishlist() {
     const [wishlist, setWishlist] = useState([]);
     const wishlistRef = useRef(null);
-    const [hoveredPokemon, setHoveredPokemon] = useState(null);
 
     useEffect(() => {
         const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
@@ -22,29 +21,40 @@ export default function Wishlist() {
     const exportToImage = () => {
         const element = wishlistRef.current;
 
-        // Calculer la hauteur dynamique du conteneur
-        const numRows = Math.ceil(wishlist.length / 7); // 7 Pokémon par ligne
-        const rowHeight = 200; // Hauteur approximative d'une ligne (à ajuster selon votre design)
-        const footerHeight = 30; // Hauteur du pied de page
-        const dynamicHeight = numRows * rowHeight + footerHeight;
+        // Définir la hauteur d'une carte Pokémon
+        const cardHeight = 280;
 
-        // Appliquer une hauteur maximale au conteneur pour éviter d'exporter trop d'espace vide
-        element.style.maxHeight = `${dynamicHeight}px`;
-        element.style.overflow = 'hidden';
+        // Nombre de colonnes (7 Pokémon par ligne)
+        const numColumns = 7;
+
+        // Calculer le nombre de lignes nécessaires
+        const numRows = Math.ceil(wishlist.length / numColumns);
+
+        // Hauteur du pied de page
+        const footerHeight = 40;
+
+        // Calculer la hauteur totale du contenu
+        const contentHeight = numRows * cardHeight;
+
+        // Calculer la hauteur totale de l'élément à capturer (contenu + pied de page)
+        const totalHeight = contentHeight + footerHeight;
 
         // Créer le pied de page dynamiquement
         const footer = document.createElement('div');
-        footer.className = "w-full text-center py-1 bg-gray-100 text-xs text-gray-600 flex items-center justify-center";
-        footer.style.minHeight = '30px'; // Hauteur minimale du pied de page
+        footer.className = "w-full text-center py-2 bg-gray-100 text-xs text-gray-600 flex items-center justify-center";
+        footer.style.minHeight = `${footerHeight}px`; // Hauteur minimale du pied de page
         footer.innerHTML = `
       <img src="/logo.png" alt="Citadel Logo" class="h-5 w-auto mr-1" />
       <span>Fait sur Citadel - PokeWishlist</span>
     `;
 
-        // Insérer le pied de page avant de capturer l'image
+        // Ajouter le pied de page à l'élément
         element.appendChild(footer);
 
-        htmlToImage.toJpeg(element, { quality: 0.95, backgroundColor: '#F3F4F6', height: dynamicHeight })
+        // Définir la hauteur totale de l'élément
+        element.style.height = `${totalHeight}px`;
+
+        htmlToImage.toJpeg(element, { quality: 0.95, backgroundColor: '#F3F4F6', height: totalHeight })
             .then(function (dataUrl) {
                 const link = document.createElement('a');
                 link.download = 'pokewishlist.jpg';
@@ -53,15 +63,18 @@ export default function Wishlist() {
 
                 // Retirer le pied de page après le téléchargement
                 element.removeChild(footer);
-                element.style.maxHeight = null; // Réinitialiser la hauteur maximale
-                element.style.overflow = null; // Réinitialiser l'overflow
+
+                // Réinitialiser la hauteur de l'élément
+                element.style.height = '';
             })
             .catch(function (error) {
                 console.error('oops, something went wrong!', error);
-                // Assurez-vous de retirer le pied de page même en cas d'erreur
+
+                // Retirer le pied de page même en cas d'erreur
                 element.removeChild(footer);
-                element.style.maxHeight = null; // Réinitialiser la hauteur maximale
-                element.style.overflow = null; // Réinitialiser l'overflow
+
+                // Réinitialiser la hauteur de l'élément
+                element.style.height = '';
             });
     };
 
@@ -73,13 +86,13 @@ export default function Wishlist() {
                     onClick={exportToImage}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 >
-                    Exporter la Wishlist
+                    Exporter en JPG
                 </button>
             </div>
             {wishlist.length === 0 ? (
                 <p className="text-center text-gray-600 mt-6">Votre wishlist est vide.</p>
             ) : (
-                <div ref={wishlistRef} className="relative" style={{ overflow: 'hidden' }}>
+                <div ref={wishlistRef} className="relative">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
                         {wishlist.map((pokemon) => (
                             <div
@@ -118,11 +131,9 @@ export default function Wishlist() {
                                     className="absolute top-3 right-3"
                                 >
                                     <img
-                                        src={hoveredPokemon === pokemon.name ? "/icons/heart-gray.svg" : "/icons/heart-red.svg"}
-                                        alt="Red Heart"
+                                        src={'/icons/heart-red.svg'}
+                                        alt="like"
                                         className="h-6 w-6 cursor-pointer"
-                                        onMouseEnter={() => setHoveredPokemon(pokemon.name)}
-                                        onMouseLeave={() => setHoveredPokemon(null)}
                                     />
                                 </button>
                             </div>
