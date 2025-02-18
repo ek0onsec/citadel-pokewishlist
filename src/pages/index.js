@@ -2,22 +2,25 @@
 import { useEffect, useState } from 'react';
 import { fetchPokemonList } from '../services/pokemon';
 import { getTypeColor } from '../utils/typeColors';
-import Loader from '@/components/Loader'; // Import du Loader
+import Loader from '@/components/Loader';
 
 export default function Home() {
     const [pokemons, setPokemons] = useState([]);
     const [wishlist, setWishlist] = useState([]);
     const [hoveredPokemon, setHoveredPokemon] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // Nouvel état pour gérer le chargement
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState(''); // Nouvel état pour le terme de recherche
+    const [filteredPokemons, setFilteredPokemons] = useState([]); // Nouvel état pour les Pokémon filtrés
 
     useEffect(() => {
         const fetchData = async () => {
-            setIsLoading(true); // Définir le chargement à true au début
+            setIsLoading(true);
             try {
                 const data = await fetchPokemonList();
                 setPokemons(data);
+                setFilteredPokemons(data); // Initialiser les Pokémon filtrés avec toutes les données
             } finally {
-                setIsLoading(false); // Définir le chargement à false une fois les données chargées
+                setIsLoading(false);
             }
 
             const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
@@ -38,14 +41,51 @@ export default function Home() {
         localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
     };
 
+    // Fonction de filtre
+    const handleSearch = (event) => {
+        const term = event.target.value;
+        setSearchTerm(term);
+
+        if (term === '') {
+            setFilteredPokemons(pokemons); // Réinitialiser à la liste complète si la recherche est vide
+            return;
+        }
+
+        let filtered = [];
+        if (term.startsWith('#')) {
+            // Recherche par numéro
+            const number = parseInt(term.slice(1));
+            if (!isNaN(number)) {
+                filtered = pokemons.filter(pokemon => pokemon.id === number);
+            }
+        } else {
+            // Recherche par nom
+            filtered = pokemons.filter(pokemon => pokemon.name.toLowerCase().includes(term.toLowerCase()));
+        }
+
+        setFilteredPokemons(filtered);
+    };
+
     return (
         <div className="container mx-auto px-4">
             <h1>Pokédex National</h1>
+
+            {/* Barre de recherche */}
+            <div className="mb-4">
+                <input
+                    type="text"
+                    placeholder="Rechercher par nom ou #numéro"
+                    className="w-full p-2 border rounded"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                />
+            </div>
+
             {isLoading ? (
-                <Loader /> // Afficher le Loader pendant le chargement
+                <Loader />
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
-                    {pokemons.map((pokemon) => (
+                    {filteredPokemons.map((pokemon) => (
                         <div
                             key={pokemon.id}
                             className="bg-white shadow-md rounded-lg p-4 relative hover:shadow-lg transition"

@@ -6,6 +6,7 @@ import * as htmlToImage from 'html-to-image';
 export default function Wishlist() {
     const [wishlist, setWishlist] = useState([]);
     const wishlistRef = useRef(null);
+    const [shinyStates, setShinyStates] = useState({}); // Nouvel état pour gérer l'état Shiny de chaque Pokémon
 
     useEffect(() => {
         const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
@@ -16,6 +17,14 @@ export default function Wishlist() {
         const updatedWishlist = wishlist.filter((p) => p.name !== pokemon.name);
         setWishlist(updatedWishlist);
         localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    };
+
+    // Fonction pour basculer l'état Shiny
+    const toggleShiny = (pokemon) => {
+        setShinyStates(prevState => ({
+            ...prevState,
+            [pokemon.id]: !prevState[pokemon.id],
+        }));
     };
 
     const exportToImage = () => {
@@ -99,9 +108,21 @@ export default function Wishlist() {
                                 key={pokemon.id}
                                 className="bg-white shadow-md rounded-lg p-4 relative hover:shadow-lg transition"
                             >
+                                {/* Afficher le bouton Shiny en haut à gauche */}
+                                <button
+                                    onClick={() => toggleShiny(pokemon)}
+                                    className="absolute top-2 left-2 bg-gray-200 rounded-full p-1 hover:bg-gray-300"
+                                >
+                                    ✨
+                                </button>
+
                                 {/* Image */}
                                 <img
-                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
+                                    src={
+                                        shinyStates[pokemon.id]
+                                            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`
+                                            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
+                                    }
                                     alt={pokemon.name}
                                     className="w-full mx-auto"
                                 />
@@ -132,7 +153,7 @@ export default function Wishlist() {
                                 >
                                     <img
                                         src={'/icons/heart-red.svg'}
-                                        alt="like"
+                                        alt="Red Heart"
                                         className="h-6 w-6 cursor-pointer"
                                     />
                                 </button>
