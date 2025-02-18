@@ -9,10 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "html-to-image": "^1.11.13",
+    "mongodb": "^6.13.0",
+    "mongoose": "^8.10.1",
     "next": "15.1.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
