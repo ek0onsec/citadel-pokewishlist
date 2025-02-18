@@ -1,3 +1,4 @@
+// src/pages/wishlist.js
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import { getTypeColor } from '../utils/typeColors';
@@ -6,12 +7,23 @@ import * as htmlToImage from 'html-to-image';
 export default function Wishlist() {
     const [wishlist, setWishlist] = useState([]);
     const wishlistRef = useRef(null);
-    const [shinyStates, setShinyStates] = useState({}); // Nouvel état pour gérer l'état Shiny de chaque Pokémon
+    const [shinyStates, setShinyStates] = useState({});
 
     useEffect(() => {
         const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         setWishlist(storedWishlist);
     }, []);
+
+    useEffect(() => {
+        // Load shiny states from localStorage
+        const storedShinyStates = JSON.parse(localStorage.getItem('shinyStates')) || {};
+        setShinyStates(storedShinyStates);
+    }, []);
+
+    useEffect(() => {
+        // Save shiny states to localStorage
+        localStorage.setItem('shinyStates', JSON.stringify(shinyStates));
+    }, [shinyStates]);
 
     const removeFromWishlist = (pokemon) => {
         const updatedWishlist = wishlist.filter((p) => p.name !== pokemon.name);
@@ -19,13 +31,20 @@ export default function Wishlist() {
         localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
     };
 
-    // Fonction pour basculer l'état Shiny
+    // Function to toggle shiny state in Wishlist
     const toggleShiny = (pokemon) => {
-        setShinyStates(prevState => ({
-            ...prevState,
-            [pokemon.id]: !prevState[pokemon.id],
-        }));
+        // Toggle shiny state locally
+        setShinyStates(prevShinyStates => {
+            const updatedShinyStates = {
+                ...prevShinyStates,
+                [pokemon.id]: !(prevShinyStates[pokemon.id] || false) // Toggle based on current state, default to false if undefined
+            };
+            localStorage.setItem('shinyStates', JSON.stringify(updatedShinyStates)); // Sync to local storage
+
+            return updatedShinyStates;
+        });
     };
+
 
     const exportToImage = () => {
         const element = wishlistRef.current;
@@ -111,7 +130,7 @@ export default function Wishlist() {
                                 {/* Afficher le bouton Shiny en haut à gauche */}
                                 <button
                                     onClick={() => toggleShiny(pokemon)}
-                                    className="absolute top-2 left-2 bg-gray-200 rounded-full p-1 hover:bg-gray-300"
+                                    className="absolute top-2 left-2 bg-gray-200 rounded-full p-1 hover:bg-gray-300 z-10"
                                 >
                                     ✨
                                 </button>
@@ -129,7 +148,7 @@ export default function Wishlist() {
 
                                 {/* Nom et Numéro */}
                                 <h3 className="text-center capitalize font-bold text-gray-700 mt-2">
-                                    #{pokemon.id} {pokemon.name}
+                                    #{pokemon.id} {pokemon.name} {shinyStates[pokemon.id] ? '⭐' : ''}
                                 </h3>
 
                                 {/* Types */}
@@ -141,8 +160,8 @@ export default function Wishlist() {
                                                 type.toLowerCase()
                                             )}`}
                                         >
-                      {type}
-                    </span>
+                                            {type}
+                                        </span>
                                     ))}
                                 </div>
 

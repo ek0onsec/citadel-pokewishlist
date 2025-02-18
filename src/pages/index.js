@@ -1,3 +1,4 @@
+// src/pages/index.js
 'use client';
 import { useEffect, useState } from 'react';
 import { fetchPokemonList } from '../services/pokemon';
@@ -9,8 +10,9 @@ export default function Home() {
     const [wishlist, setWishlist] = useState([]);
     const [hoveredPokemon, setHoveredPokemon] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState(''); // Nouvel état pour le terme de recherche
-    const [filteredPokemons, setFilteredPokemons] = useState([]); // Nouvel état pour les Pokémon filtrés
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredPokemons, setFilteredPokemons] = useState([]);
+    const [shinyStates, setShinyStates] = useState({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -18,7 +20,7 @@ export default function Home() {
             try {
                 const data = await fetchPokemonList();
                 setPokemons(data);
-                setFilteredPokemons(data); // Initialiser les Pokémon filtrés avec toutes les données
+                setFilteredPokemons(data);
             } finally {
                 setIsLoading(false);
             }
@@ -30,40 +32,57 @@ export default function Home() {
         fetchData();
     }, []);
 
+    // Load shiny states from localStorage on component mount
+    useEffect(() => {
+        const storedShinyStates = JSON.parse(localStorage.getItem('shinyStates')) || {};
+        setShinyStates(storedShinyStates);
+    }, []);
+
+    // Save shiny states to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('shinyStates', JSON.stringify(shinyStates));
+    }, [shinyStates]);
+
     const toggleWishlist = (pokemon) => {
         let updatedWishlist;
         if (wishlist.some((p) => p.name === pokemon.name)) {
             updatedWishlist = wishlist.filter((p) => p.name !== pokemon.name);
         } else {
-            updatedWishlist = [...wishlist, pokemon];
+            // Store the shiny state when adding to wishlist
+            const shiny = shinyStates[pokemon.id] || false;
+            updatedWishlist = [...wishlist, { ...pokemon, shiny }];
         }
         setWishlist(updatedWishlist);
         localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
     };
 
-    // Fonction de filtre
     const handleSearch = (event) => {
         const term = event.target.value;
         setSearchTerm(term);
 
         if (term === '') {
-            setFilteredPokemons(pokemons); // Réinitialiser à la liste complète si la recherche est vide
+            setFilteredPokemons(pokemons);
             return;
         }
 
         let filtered = [];
         if (term.startsWith('#')) {
-            // Recherche par numéro
             const number = parseInt(term.slice(1));
             if (!isNaN(number)) {
                 filtered = pokemons.filter(pokemon => pokemon.id === number);
             }
         } else {
-            // Recherche par nom
             filtered = pokemons.filter(pokemon => pokemon.name.toLowerCase().includes(term.toLowerCase()));
         }
 
         setFilteredPokemons(filtered);
+    };
+
+    const toggleShiny = (pokemon) => {
+        setShinyStates(prevState => ({
+            ...prevState,
+            [pokemon.id]: !prevState[pokemon.id],
+        }));
     };
 
     return (
@@ -90,16 +109,28 @@ export default function Home() {
                             key={pokemon.id}
                             className="bg-white shadow-md rounded-lg p-4 relative hover:shadow-lg transition"
                         >
+                            {/* Afficher le bouton Shiny en haut à gauche */}
+                            <button
+                                onClick={() => toggleShiny(pokemon)}
+                                className="absolute top-2 left-2 bg-gray-200 rounded-full p-1 hover:bg-gray-300 z-10"
+                            >
+                                ✨
+                            </button>
+
                             {/* Image */}
                             <img
-                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
+                                src={
+                                    shinyStates[pokemon.id]
+                                        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`
+                                        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
+                                }
                                 alt={pokemon.name}
                                 className="w-full mx-auto"
                             />
 
                             {/* Nom et Numéro */}
                             <h3 className="text-center capitalize font-bold text-gray-700 mt-2">
-                                #{pokemon.id} {pokemon.name}
+                                #{pokemon.id} {pokemon.name} {shinyStates[pokemon.id] ? '⭐' : ''}
                             </h3>
 
                             {/* Types */}
@@ -111,8 +142,8 @@ export default function Home() {
                                             type.toLowerCase()
                                         )}`}
                                     >
-                    {type}
-                  </span>
+                                        {type}
+                                    </span>
                                 ))}
                             </div>
 
