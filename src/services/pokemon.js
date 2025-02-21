@@ -1,5 +1,5 @@
 export const fetchPokemonList = async () => {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=721');
+    const response = await fetch('https://pokeapi.co/api/v2/pokemon');
     const data = await response.json();
 
     // Récupérer les détails de chaque Pokémon (nom et types en français)

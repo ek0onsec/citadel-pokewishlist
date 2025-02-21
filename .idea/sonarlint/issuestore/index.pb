@@ -1,8 +1,6 @@
 
 9
 	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
-?
-src/app/page.js,8\1\81bad8b6440a0d75bcac083dfaaf1694bd9ce8b8
 A
 src/app/layout.js,b\7\b7c052a7d21b1daeb1c65f186a3f5898d9c80896
 B
@@ -15,17 +13,11 @@ H
 src/components/Navbar.js,2\d\2d4879a2b825dad8d007f4486bb3dca97c81dd6d
 A
 src/pages/_app.js,e\9\e936121dda8f9c2ffc041c94b844a46992031b88
-E
-src/styles/global.css,3\e\3ea85257d8c74ab2f79dac9121fc26edb558777a
 G
 src/utils/typeColors.js,0\6\06c87f0883a966b4c6cd123ed3c5ee23db99a54b
 B
 tailwind.config.js,0\9\0918cbb76f2c44f223706cec9d31a32cd1177ce4
 C
 src/app/globals.css,d\a\da1d6f21d01d0f36b5501dffcf7fd160ffcb290d
-F
-src/styles/globals.css,f\4\f451456fbd2ac1cc3825255bfe3cd58d1971e047
-J
-src/components/Loader.j.js,a\8\a85f24fc6445ec766b359c7cb7145d10f5a59e83
 H
 src/components/Loader.js,3\0\302df21011c35053905a3e1aae3479df354d5929
