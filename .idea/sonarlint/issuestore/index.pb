@@ -21,3 +21,9 @@ C
 src/app/globals.css,d\a\da1d6f21d01d0f36b5501dffcf7fd160ffcb290d
 H
 src/components/Loader.js,3\0\302df21011c35053905a3e1aae3479df354d5929
+G
+src/pages/share/[id].js,4\8\48b38516db7bb5c358990751cdef0e36fc84d75c
+4
+.env,3\c\3c84dcdc6bbe3d7817c49dcdc327b926fea1808a
+I
+src/pages/api/wishlist.js,2\b\2bd1108b13ca3321a153aaa574d392efd1bd7fab
