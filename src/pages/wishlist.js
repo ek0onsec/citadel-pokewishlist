@@ -139,12 +139,6 @@ export default function Wishlist() {
 
             <div className="flex justify-end mb-4">
                 <button
-                    onClick={exportToImage}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-                >
-                    Exporter en JPG
-                </button>
-                <button
                     onClick={generateShareLink}
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                 >
@@ -162,7 +156,7 @@ export default function Wishlist() {
             {wishlist.length === 0 && isMounted ? (
                 <p className="text-center text-gray-600 mt-6">Votre wishlist est vide.</p>
             ) : (
-                <div ref={wishlistRef} className="relative">
+                <div className="relative">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
                         {wishlist.map((pokemon) => (
                             <div

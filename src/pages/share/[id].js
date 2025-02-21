@@ -119,7 +119,7 @@ export default function SharedWishlist() {
             {wishlist.length === 0 ? (
                 <p className="text-center text-gray-600 mt-6">Cette wishlist est vide ou n'existe pas.</p>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
+                <div ref={wishlistRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
                     {wishlist.map((pokemon) => (
                         <div
                             key={pokemon.id}
